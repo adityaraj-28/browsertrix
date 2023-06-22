@@ -41,10 +41,12 @@ export class S3StorageSync
       endPoint: url.hostname,
       port: Number(url.port) || (url.protocol === "https:" ? 443 : 80),
       useSSL: url.protocol === "https:",
-      accessKey,
-      secretKey,
-      partSize: 100*1024*1024
+      accessKey: accessKey,
+      secretKey: secretKey,
+      partSize: 100*1024*1024,
+      sessionToken: urlOrData.sessionToken
     });
+
 
     this.client.enableSHA256 = true;
 
@@ -66,7 +68,6 @@ export class S3StorageSync
       "prefix": this.objectPrefix,
       "targetFilename": this.targetFilename
     };
-    logger.info("S3 file upload information", fileUploadInfo, "s3Upload");
 
     await this.client.fPutObject(this.bucketName, this.objectPrefix + targetFilename, srcFilename);
 
@@ -124,6 +125,7 @@ export function initStorage() {
     endpointUrl,
     accessKey: process.env.STORE_ACCESS_KEY,
     secretKey: process.env.STORE_SECRET_KEY,
+    sessionToken: process.env.SESSION_TOKEN
   };
 
   const opts = {
